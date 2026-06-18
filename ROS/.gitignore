@@ -1,0 +1,12 @@
+__pycache__/
+**/__pycache__/
+# Output e risultati sperimentali
+results_gset_k2/
+tracking_logs/
+
+# Script locali
+run_all_gset.sh
+
+# Python
+__pycache__/
+*.pyc
