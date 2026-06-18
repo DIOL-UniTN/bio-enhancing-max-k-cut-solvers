@@ -1,140 +1,131 @@
-# Enhancing ROS with Bio-Inspired approaches
-Project for the course Bio-Inspired AI
+# Enhancing Max-k-Cut Solvers through Bio-Inspired Approaches
 
-## Description
+Code for the BIOMAP 2026 workshop paper, part of the BIO-inspired Methods for Pattern Recognition track at ICPR 2026.
 
-This project implements several meta-heuristic algorithms to solve the Max-k-Cut problem using the ROS (Relax-Optimize-and-Sample) approach based on Graph Neural Networks (GNN).
+## Authors
+
+- Pietro De Angeli
+- Giorgia Gabardi
+- Alberto Vendramini
+- Erik Nielsen
+- Stefano Genetti
+- Giovanni Iacca
+
+Pietro De Angeli, Giorgia Gabardi, and Alberto Vendramini contributed equally to this work.
+
+Department of Information Engineering and Computer Science, University of Trento, Italy
+
+Emails:
+
+- pietro.deangeli, giorgia.gabardi, alberto.vendramini@studenti.unitn.it
+- erik.nielsen, stefano.genetti, giovanni.iacca@unitn.it
+
+## Overview
+
+This repository studies a hybrid solver for the Max-$k$-Cut problem. The pipeline starts from solutions produced by ROS (Relax-Optimize-and-Sample), a Graph Neural Network-based framework, and refines them with bio-inspired optimization methods.
+
+The paper evaluates three main families of refiners:
+
+1. Genetic Algorithm (GA)
+2. Ant Colony Optimization (ACO)
+3. Multi-species Genetic Algorithm (MGA)
+
+Local search is also used in the hybrid variants, and the experiments focus on the Gset benchmark for $k \in \{2, 3, 10\}$.
+
+## Repository Layout
+
+- `ROS/`: implementation of ROS and the bio-inspired refiners
+- `Gset/`: benchmark instances used in the experiments
+- `run_all_gset_*.sh`: batch scripts for running the reported experiments
+- `install.sh`: helper script for environment setup
 
 ## Installation
 
-
-### Automatic Installation
-
-The project includes an automatic installation script that handles all dependencies:
+The easiest way to set up the project is with the provided installer:
 
 ```bash
 bash install.sh
 ```
 
-The script will ask you to choose the appropriate version:
-1. **CPU only** - For systems without CUDA GPU
-2. **CUDA 11.8** - For GPUs with CUDA 11.8
-3. **CUDA 12.1** - For GPUs with CUDA 12.1
+During installation you will be asked to choose the target environment:
 
-The script will automatically install the needed dependencies.
+1. CPU only
+2. CUDA 11.8
+3. CUDA 12.1
 
-### Installation Verification
+If you already manage environments manually, you can also use the dependencies listed in `ROS/requirements.txt` or `ROS/environment.yml`.
 
-After installation, verify everything is working correctly:
+After installation, a quick sanity check is:
 
 ```bash
-python -c 'import torch; import torch_geometric; print("Installation successful!")'
+python -c "import torch; import torch_geometric; print('Installation successful!')"
 ```
 
-## Usage
+## Running the Code
 
-### Available Algorithms
+All executable entry points are under `ROS/`. The main script accepts the algorithm name through `--alg` and the benchmark configuration through the remaining arguments.
 
-The project includes the following ROS approaches (situated in the ROS/ros/ros.py file):
+### Single Run
 
-1. **ros_aco_only** - ROS + Ant Colony Optimization 
-2. **ros_aco** - ROS + Ant Colony Optimization with Local Search
-3. **ros_ga** - ROS with Genetic Algorithm
-4. **ros_ga_ls** - ROS + Genetic Algorithm with Local Search
-5. **ros_mga** - ROS + Multi-species GA with Local Search
-
-### Supported k Values
-
-Each algorithm can be run with different k values (number of partitions):
-- **k=2** - 2-way partitioning (classic Max-Cut)
-- **k=3** - 3-way partitioning
-- **k=10** - 10-way partitioning
-
-### Batch Execution on Gset
-
-To run an algorithm on a subset of Gset benchmarks (G1-G48), use the corresponding batch scripts:
-
-#### Example: ROS+ACO+LS  with k=2
-```bash
-bash run_all_gset_ros_aco_ls_k2.sh
-```
-
-### Script Naming Convention
-
-The scripts follow this naming scheme:
-
-```
-run_all_gset_ros_[ALGORITHM]_k[VALUE].sh
-```
-
-Where:
-- `[ALGORITHM]` = aco_ls, aco_only, ga, ga_ls, mga
-- `[VALUE]` = 2, 3, or 10
-
-**Available scripts:**
-- `run_all_gset_ros_aco_ls_k2.sh`, `run_all_gset_ros_aco_ls_k3.sh`, `run_all_gset_ros_aco_ls_k10.sh`
-- `run_all_gset_ros_aco_only_k2.sh`, `run_all_gset_ros_aco_only_k3.sh`, `run_all_gset_ros_aco_only_k10.sh`
-- `run_all_gset_ros_ga_ls_k2.sh`, `run_all_gset_ros_ga_ls_k3.sh`, `run_all_gset_ros_ga_ls_k10.sh`
-- `run_all_gset_ros_ga_k2.sh`, `run_all_gset_ros_ga_k3.sh`, `run_all_gset_ros_ga_k10.sh`
-- `run_all_gset_ros_mga_k2.sh`, `run_all_gset_ros_mga_k3.sh`, `run_all_gset_ros_mga_k10.sh`
-
-### Results
-
-Each batch script creates a dedicated directory with the results:
-
-```
-results_gset_ros_[ALGORITHM]_k[VALUE]/
-├── execution_log.txt       # Detailed execution log
-├── summary.csv             # Results summary in CSV format
-├── G1_output.txt           # Output for graph G1
-├── G2_output.txt           # Output for graph G2
-└── ...
-```
-
-The `summary.csv` file contains:
-- Graph name (G1, G2, ..., G48)
-- Final result
-- Relaxed result (ROS)
-- Execution time (seconds)
-- Status (SUCCESS/FAILED)
-
-### Single Execution
-
-To run a single test on a specific graph:
+Example: run ROS with ACO refinement on the first Gset instance for Max-2-Cut.
 
 ```bash
 cd ROS
 python main.py --alg ros_aco --graph_type gset --gset 1 --weight_mode 1 --k 2
 ```
 
-Parameters:
-- `--alg`: Algorithm to use (ros_aco, ros_ga, ros_mga, etc.)
-- `--graph_type`: Graph type (gset for benchmarks)
-- `--gset`: Gset graph number (1-48)
-- `--weight_mode`: 1 to use original weights
-- `--k`: Number of partitions (2, 3, or 10)
+Common arguments:
 
-## Project Structure
+- `--alg`: algorithm to run, for example `ros`, `ros_aco`, `ros_aco_only`, `ros_ga`, `ros_ga_improved`, `ros_mga`, `ros_local_search`, `ros_vanilla`, `ros_abc`, or `ga_only`
+- `--graph_type`: graph family, typically `gset`
+- `--gset`: Gset instance index
+- `--weight_mode`: use the original benchmark weights with `1`
+- `--k`: number of partitions
 
+### Batch Experiments
+
+The top-level `run_all_gset_*.sh` scripts reproduce the benchmark runs reported in the paper. Their naming convention is:
+
+```text
+run_all_gset_ros_[method]_k[value].sh
 ```
-Max-k-Cut/
-├── README.md              # This file
-├── install.sh             # Installation script
-├── Gset/                  # Gset benchmark dataset
-├── ROS/                   # ROS algorithms implementation
-│   ├── main.py           # Main entry point
-│   ├── ros/              # ROS algorithm modules
-│   └── utils.py          # Utility functions
-└── run_all_gset_*.sh     # Batch scripts for complete execution
+
+where `[method]` is one of `aco_ls`, `aco_only`, `ga`, `ga_ls`, or `mga`, and `[value]` is `2`, `3`, or `10`.
+
+Example:
+
+```bash
+bash run_all_gset_ros_ga_ls_k2.sh
 ```
+
+Each batch script creates a results directory such as `results_gset_ros_ga_ls_k2/` containing:
+
+- `execution_log.txt`: full terminal log
+- `summary.csv`: per-instance summary
+- `G*_output.txt`: output for each Gset instance
+
+## Paper-Focused Methods
+
+The paper’s experiments compare ROS against the following post-optimizers:
+
+- `ros_ga` and `ros_ga_improved`: GA-based refiners used for the paper’s genetic-algorithm experiments
+- `ros_aco` and `ros_aco_only`: ACO-based refiners, with and without local search
+- `ros_mga`: multi-species GA with local search and explicit diversity preservation
+
+The codebase also contains related variants used for additional experimentation and ablation studies.
 
 ## Notes
 
-- Batch scripts must be run from the project root directory
-- Execution times vary based on graph size and chosen algorithm
-- For large graphs, execution may take several hours
-- GPU usage is recommended when available to accelerate GNN training
+- The experiments were run on the Gset subset `G1` to `G48`.
+- GPU acceleration is recommended when available, since ROS relies on GNN inference.
+- The hybrid solvers are computation-heavy; runtime grows with graph size, `k`, and the amount of local search.
 
-## References
+## Citation
 
-For more details on the ROS approach and implemented algorithms, please refer to the reference papers in the `ROS/` directory.
+If you use this code, please cite the BIOMAP 2026 workshop paper:
+
+> Enhancing Max-$k$-Cut Solvers through Bio-Inspired Approaches
+
+## Acknowledgements
+
+This repository builds on the public ROS implementation and adapts it for bio-inspired refinement experiments on Max-$k$-Cut.
