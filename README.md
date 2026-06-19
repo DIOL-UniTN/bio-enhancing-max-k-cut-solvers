@@ -29,6 +29,8 @@ k ∈ {2,3,10}
 
 demonstrating the effectiveness of bio-inspired refinement for improving learning-based Max-*k*-Cut solutions.
 
+![Performance Profile](performance_profile.jpg)
+
 ## 🗂️ Repository Structure
 
 .
